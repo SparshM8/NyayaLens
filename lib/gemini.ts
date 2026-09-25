@@ -4,6 +4,8 @@ import { DOCUMENT_ANALYSIS_SYSTEM_PROMPT, CHAT_SYSTEM_PROMPT, COMPARISON_SYSTEM_
 import { ACME_ANALYSIS, CONSULTANT_ANALYSIS } from './sampleDocuments';
 import { SAMPLE_COMPARISON } from './comparisonSamples';
 
+export const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+
 export function getGeminiClient(customApiKey?: string): GoogleGenerativeAI | null {
   const apiKey = customApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey || apiKey.trim() === '') {
@@ -40,7 +42,7 @@ export async function analyzeDocumentWithGemini(
   if (genAI) {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: DEFAULT_GEMINI_MODEL,
         generationConfig: {
           responseMimeType: 'application/json',
           temperature: 0.2,
@@ -80,7 +82,7 @@ export async function analyzeDocumentWithGemini(
         nextSteps: parsed.nextSteps || [],
         generatedAt: new Date().toISOString(),
         isAiGenerated: true,
-        modelUsed: 'Google Gemini 1.5 Flash (Live API)',
+        modelUsed: `Google Gemini (${DEFAULT_GEMINI_MODEL})`,
       };
     } catch (err) {
       console.warn('Gemini API call failed or rate-limited, engaging intelligent legal analysis engine:', err);
@@ -327,7 +329,7 @@ export async function chatWithDocument(
   if (genAI) {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: DEFAULT_GEMINI_MODEL,
         generationConfig: {
           temperature: 0.1,
         },
@@ -464,7 +466,7 @@ export async function compareContractsWithGemini(
   if (genAI) {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: DEFAULT_GEMINI_MODEL,
         generationConfig: {
           responseMimeType: 'application/json',
           temperature: 0.1,

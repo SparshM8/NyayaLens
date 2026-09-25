@@ -68,12 +68,18 @@ export default function SettingsPage() {
   const [savedSuccess, setSavedSuccess] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [serverStatus, setServerStatus] = useState<{ hasServerKey: boolean; model: string; message: string } | null>(null)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("NYAYALENS_GEMINI_API_KEY") || ""
       setApiKey(stored)
     }
+
+    fetch("/api/status")
+      .then((res) => res.json())
+      .then((data) => setServerStatus(data))
+      .catch((err) => console.warn("Status check failed:", err))
   }, [])
 
   function handleSaveKey() {
@@ -89,12 +95,35 @@ export default function SettingsPage() {
   }
 
   async function handleTestKey() {
-    if (!apiKey.trim()) {
-      setTestResult({ success: false, message: "Please enter a Gemini API key first." })
-      return
-    }
     setIsTesting(true)
     setTestResult(null)
+
+    if (!apiKey.trim() && serverStatus?.hasServerKey) {
+      // Test server-side key
+      try {
+        const res = await fetch("/api/status")
+        if (res.ok) {
+          setTestResult({
+            success: true,
+            message: `Server-side Gemini connection verified (${serverStatus.model})!`,
+          })
+        }
+      } catch {
+        setTestResult({
+          success: false,
+          message: "Could not reach server endpoint.",
+        })
+      } finally {
+        setIsTesting(false)
+      }
+      return
+    }
+
+    if (!apiKey.trim()) {
+      setTestResult({ success: false, message: "Please enter a Gemini API key first." })
+      setIsTesting(false)
+      return
+    }
 
     try {
       const res = await fetch(
@@ -144,7 +173,11 @@ export default function SettingsPage() {
               <span className="text-xs font-normal text-muted-foreground">
                 {apiKey ? (
                   <span className="text-review-low font-medium flex items-center gap-1">
-                    <CheckCircle className="size-3.5" /> Live Key Active
+                    <CheckCircle className="size-3.5" /> Browser Key Active
+                  </span>
+                ) : serverStatus?.hasServerKey ? (
+                  <span className="text-review-low font-medium flex items-center gap-1">
+                    <CheckCircle className="size-3.5" /> .env Key Active ({serverStatus.model})
                   </span>
                 ) : (
                   <span className="text-chart-4 font-medium">Demo Mode Active</span>
@@ -154,12 +187,19 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              NyayaLens uses Google Gemini 1.5 Flash for live document analysis and grounded Q&A. If no key is set, NyayaLens runs in <strong>Instant Demo Mode</strong> with pre-loaded contracts.
+              NyayaLens uses Google Gemini for live document analysis and grounded Q&A.
+              {serverStatus?.hasServerKey ? (
+                <span className="text-review-low block mt-1 font-medium">
+                  ✓ Configured via .env: {serverStatus.model} is ready for live queries.
+                </span>
+              ) : (
+                <span> If no key is set, NyayaLens runs in <strong>Instant Demo Mode</strong> with pre-loaded contracts.</span>
+              )}
             </p>
 
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="gemini-key" className="text-xs font-semibold uppercase text-muted-foreground">
-                API Key
+                Override Key (Optional)
               </Label>
               <div className="flex gap-2">
                 <Input
@@ -167,10 +207,10 @@ export default function SettingsPage() {
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="AIzaSy..."
+                  placeholder={serverStatus?.hasServerKey ? "Key loaded from .env (optional custom override)" : "AIzaSy..."}
                   className="font-mono text-sm"
                 />
-                <Button variant="outline" onClick={handleTestKey} disabled={isTesting || !apiKey}>
+                <Button variant="outline" onClick={handleTestKey} disabled={isTesting || (!apiKey && !serverStatus?.hasServerKey)}>
                   {isTesting ? "Testing..." : "Test"}
                 </Button>
                 <Button onClick={handleSaveKey}>
