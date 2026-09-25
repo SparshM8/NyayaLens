@@ -5,7 +5,9 @@ export async function POST(req: NextRequest) {
   try {
     const customApiKey = req.headers.get('x-gemini-api-key') || undefined;
     const body = await req.json();
-    const { documentText, chatHistory = [], question } = body;
+    const question = body.question || body.query || body.prompt;
+    const documentText = body.documentText || body.context || body.text || '';
+    const chatHistory = body.chatHistory || body.history || [];
 
     if (!question || question.trim().length === 0) {
       return NextResponse.json(
@@ -28,7 +30,14 @@ export async function POST(req: NextRequest) {
       customApiKey
     );
 
-    return NextResponse.json(response);
+    return NextResponse.json({
+      text: response.text,
+      answer: response.text,
+      relevantClauses: response.relevantClauses,
+      citations: response.relevantClauses,
+      whatToVerify: response.whatToVerify,
+      keyTakeaways: [response.whatToVerify],
+    });
   } catch (error: any) {
     console.error('Error in chat API:', error);
     return NextResponse.json(

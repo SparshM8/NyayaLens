@@ -3,16 +3,24 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import {
+  AlertTriangle,
   ArrowRightLeft,
   Building2,
   CalendarDays,
+  Check,
+  CheckCircle2,
   CircleCheck,
   Download,
   FileText,
+  HelpCircle,
+  Lightbulb,
   ListChecks,
   MessageSquareText,
+  Quote,
   RotateCcw,
+  Scale,
   ScrollText,
+  ShieldAlert,
   Sparkles,
   User,
 } from "lucide-react"
@@ -29,9 +37,13 @@ import {
   obligations as defaultObligations,
   clauses as defaultClauses,
   suggestedQuestions as defaultQuestions,
+  sampleInconsistencies,
+  sampleJargonList,
   type Clause,
   type Obligation,
   type SuggestedQuestion,
+  type InconsistencyItem,
+  type JargonTranslation,
 } from "@/lib/sample-data"
 import { ACME_ANALYSIS } from "@/lib/sampleDocuments"
 
@@ -52,7 +64,10 @@ export default function DashboardPage() {
   const [docObligations, setDocObligations] = useState<Obligation[]>(defaultObligations)
   const [docClauses, setDocClauses] = useState<Clause[]>(defaultClauses)
   const [docQuestions, setDocQuestions] = useState<SuggestedQuestion[]>(defaultQuestions)
+  const [docInconsistencies, setDocInconsistencies] = useState<InconsistencyItem[]>(sampleInconsistencies)
+  const [docJargon, setDocJargon] = useState<JargonTranslation[]>(sampleJargonList)
   const [docRawText, setDocRawText] = useState<string>("")
+  const [selectedJargonId, setSelectedJargonId] = useState<string>(sampleJargonList[0]?.id || "")
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -144,6 +159,19 @@ export default function DashboardPage() {
       )
     }
 
+    if (analysis.explainLikeIm18 && analysis.explainLikeIm18.length > 0) {
+      const formattedJargon = analysis.explainLikeIm18.map((j: any) => ({
+        id: j.id,
+        originalClause: j.originalClause,
+        section: j.section,
+        simplifiedExplanation: j.simplifiedExplanation,
+        whyThisMatters: j.whyThisMatters,
+        practicalExample: j.practicalExample || "Check with legal professional.",
+      }))
+      setDocJargon(formattedJargon)
+      setSelectedJargonId(formattedJargon[0]?.id || "")
+    }
+
     if (analysis.rawText) {
       setDocRawText(analysis.rawText)
     }
@@ -171,12 +199,17 @@ export default function DashboardPage() {
       setDocObligations(defaultObligations)
       setDocClauses(defaultClauses)
       setDocQuestions(defaultQuestions)
+      setDocInconsistencies(sampleInconsistencies)
+      setDocJargon(sampleJargonList)
+      setSelectedJargonId(sampleJargonList[0]?.id || "")
       setDocRawText("")
       if (typeof window !== "undefined") {
         sessionStorage.removeItem("NYAYALENS_ACTIVE_ANALYSIS")
       }
     }
   }
+
+  const activeJargonItem = docJargon.find((j) => j.id === selectedJargonId) || docJargon[0]
 
   const stats = [
     { label: "Clauses analyzed", value: docInfo.clauseCount, icon: ScrollText },
@@ -212,7 +245,7 @@ export default function DashboardPage() {
           </Button>
           <Link href="/analyze">
             <Button size="sm" className="text-xs h-7">
-              + Upload New
+              + Upload / Paste
             </Button>
           </Link>
         </div>
@@ -298,23 +331,37 @@ export default function DashboardPage() {
             Clause analysis
           </TabsTrigger>
           <TabsTrigger
+            value="jargon"
+            className="rounded-lg border border-transparent bg-card px-3.5 py-2 data-active:border-border"
+          >
+            <Sparkles className="size-4 mr-1.5 text-chart-4" />
+            Explain Like I'm 18
+          </TabsTrigger>
+          <TabsTrigger
+            value="inconsistencies"
+            className="rounded-lg border border-transparent bg-card px-3.5 py-2 data-active:border-border"
+          >
+            <AlertTriangle className="size-4 mr-1.5 text-destructive" />
+            Inconsistencies &amp; Conflicts ({docInconsistencies.length})
+          </TabsTrigger>
+          <TabsTrigger
             value="qa"
             className="rounded-lg border border-transparent bg-card px-3.5 py-2 data-active:border-border"
           >
-            <MessageSquareText className="size-4 mr-1.5" />
+            <MessageSquareText className="size-4 mr-1.5 text-primary" />
             Ask the document
           </TabsTrigger>
           <TabsTrigger
             value="questions"
             className="rounded-lg border border-transparent bg-card px-3.5 py-2 data-active:border-border"
           >
-            <ListChecks className="size-4 mr-1.5" />
+            <ListChecks className="size-4 mr-1.5 text-review-low" />
             Questions to raise
           </TabsTrigger>
         </TabsList>
 
+        {/* Tab 1: Clause Analysis */}
         <TabsContent value="analysis" className="flex flex-col gap-6">
-          {/* Executive summary + obligations */}
           <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
             <Card>
               <CardHeader>
@@ -374,10 +421,171 @@ export default function DashboardPage() {
           <ClauseExplorer customClauses={docClauses} />
         </TabsContent>
 
+        {/* Tab 2: Explain Like I'm 18 (Jargon Buster) */}
+        <TabsContent value="jargon" className="flex flex-col gap-6">
+          <Card className="p-6 space-y-6">
+            <div className="flex flex-col gap-1 border-b border-border pb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-5 text-chart-4" />
+                <h3 className="font-display text-xl font-semibold text-foreground">
+                  Explain Like I&apos;m 18 — Legalese Translator
+                </h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                GenAI transformation translating dense contract phrasing into everyday, accessible English with practical financial and legal implications.
+              </p>
+            </div>
+
+            {/* Selector Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {docJargon.map((item, idx) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedJargonId(item.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition cursor-pointer ${
+                    activeJargonItem.id === item.id
+                      ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                      : "border border-border bg-card hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  #{idx + 1} {item.section.split("—")[0].trim()}
+                </button>
+              ))}
+            </div>
+
+            {/* Before and After Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Raw Legalese */}
+              <div className="p-5 rounded-2xl border border-border bg-muted/30 flex flex-col justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                      Raw Legal Text
+                    </span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {activeJargonItem.section}
+                    </span>
+                  </div>
+                  <p className="text-sm font-serif italic text-foreground/80 leading-relaxed pl-3 border-l-2 border-border pt-1">
+                    &ldquo;{activeJargonItem.originalClause}&rdquo;
+                  </p>
+                </div>
+                <span className="text-[11px] text-muted-foreground">
+                  Formal contract phrasing that obscures personal liability.
+                </span>
+              </div>
+
+              {/* NyayaLens Simplified */}
+              <div className="p-5 rounded-2xl border border-primary/30 bg-primary/5 flex flex-col justify-between gap-4">
+                <div className="space-y-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded w-fit inline-block">
+                    NyayaLens Plain English Explanation
+                  </span>
+                  <p className="text-sm font-semibold text-foreground leading-relaxed">
+                    {activeJargonItem.simplifiedExplanation}
+                  </p>
+                  <div className="p-3 rounded-xl bg-card border border-border space-y-1">
+                    <span className="text-xs font-semibold text-chart-4 flex items-center gap-1">
+                      <Lightbulb className="size-3.5" />
+                      Why this matters to you:
+                    </span>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {activeJargonItem.whyThisMatters}
+                    </p>
+                  </div>
+                  {activeJargonItem.practicalExample && (
+                    <div className="text-xs text-foreground/90 bg-muted/60 p-3 rounded-xl border border-border">
+                      <strong className="text-primary">Real-world scenario: </strong>
+                      {activeJargonItem.practicalExample}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* Tab 3: Inconsistencies & Conflicts */}
+        <TabsContent value="inconsistencies" className="flex flex-col gap-6">
+          <Card className="p-6 space-y-5">
+            <div className="flex flex-col gap-1 border-b border-border pb-4">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="size-5 text-destructive" />
+                <h3 className="font-display text-xl font-semibold text-foreground">
+                  Contract Inconsistencies &amp; Conflict Detector
+                </h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Identifies conflicting terms, contradictory notice obligations, and legally questionable clauses requiring harmonization before signing.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {docInconsistencies.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-5 rounded-2xl border border-border bg-card space-y-4"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h4 className="text-base font-semibold text-foreground flex items-center gap-2">
+                      <AlertTriangle className="size-4 text-destructive shrink-0" />
+                      {item.title}
+                    </h4>
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                        item.severity === "high"
+                          ? "bg-destructive/15 text-destructive border-destructive/30"
+                          : "bg-chart-4/15 text-chart-4 border-chart-4/30"
+                      }`}
+                    >
+                      {item.severity} severity conflict
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-1">
+                      <span className="text-[11px] font-semibold text-primary block">
+                        {item.clauseA.section}
+                      </span>
+                      <p className="text-xs font-serif italic text-muted-foreground leading-relaxed">
+                        &ldquo;{item.clauseA.text}&rdquo;
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl border border-border bg-muted/30 space-y-1">
+                      <span className="text-[11px] font-semibold text-destructive block">
+                        {item.clauseB.section}
+                      </span>
+                      <p className="text-xs font-serif italic text-muted-foreground leading-relaxed">
+                        &ldquo;{item.clauseB.text}&rdquo;
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-accent/40 border border-border space-y-1.5 text-xs">
+                    <strong className="text-foreground block">
+                      Conflict Analysis:
+                    </strong>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {item.conflictAnalysis}
+                    </p>
+                    <div className="pt-1 text-primary">
+                      <strong>Recommended fix: </strong> {item.recommendation}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* Tab 4: Ask Your Document (Grounded Chat) */}
         <TabsContent value="qa">
           <QaPanel documentText={docRawText} documentTitle={docInfo.title} />
         </TabsContent>
 
+        {/* Tab 5: Questions to Raise Checklist */}
         <TabsContent value="questions">
           <QuestionsChecklist customQuestions={docQuestions} />
         </TabsContent>

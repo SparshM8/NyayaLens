@@ -35,6 +35,25 @@ export type QAExample = {
   questionsToConsider: string[]
 }
 
+export type InconsistencyItem = {
+  id: string
+  title: string
+  severity: "high" | "medium" | "low"
+  clauseA: { section: string; text: string }
+  clauseB: { section: string; text: string }
+  conflictAnalysis: string
+  recommendation: string
+}
+
+export type JargonTranslation = {
+  id: string
+  originalClause: string
+  section: string
+  simplifiedExplanation: string
+  whyThisMatters: string
+  practicalExample: string
+}
+
 export type DocumentSummary = {
   id: string
   name: string
@@ -330,12 +349,105 @@ export const qaExamples: QAExample[] = [
   },
 ]
 
+export const sampleInconsistencies: InconsistencyItem[] = [
+  {
+    id: "inc-1",
+    title: "Notice Period Disparity Between Probation and Post-Confirmation",
+    severity: "high",
+    clauseA: {
+      section: "Section 7.1 (Probation Termination)",
+      text: "The Company may terminate with twenty-four (24) hours notice, whereas Employee must provide thirty (30) days notice.",
+    },
+    clauseB: {
+      section: "Section 7.2 (Post-Confirmation Termination)",
+      text: "Either party may terminate by providing ninety (90) days written notice... company reserves sole option to require Employee to serve notice without buyout.",
+    },
+    conflictAnalysis:
+      "Creates an asymmetric burden where employer can terminate almost instantly (24 hours) during probation, but retains 90-day lock-in with discretionary buyout refusal post-confirmation.",
+    recommendation:
+      "Negotiate symmetrical notice rights (e.g. 30 days during probation, 45-60 days post-confirmation with mutual salary buyout option).",
+  },
+  {
+    id: "inc-2",
+    title: "Governing Law vs. Unilateral Arbitrator Appointment Conflict",
+    severity: "high",
+    clauseA: {
+      section: "Section 10.1 (Governing Law)",
+      text: "This Agreement shall be governed by and construed in accordance with the laws of India.",
+    },
+    clauseB: {
+      section: "Section 10.2 (Dispute Resolution)",
+      text: "Sole Arbitrator appointed unilaterally by the Managing Director of the Company.",
+    },
+    conflictAnalysis:
+      "Under Indian Arbitration & Conciliation jurisprudence (Perkins Eastman Architects v. HSCC), unilateral arbitrator appointment by an interested party is legally impermissible and vulnerable to challenge.",
+    recommendation:
+      "Clarify that any arbitrator must be appointed by mutual written consent of both parties or through an institutional arbitral forum.",
+  },
+  {
+    id: "inc-3",
+    title: "Personal Time IP Claim vs. Defined Working Scope",
+    severity: "medium",
+    clauseA: {
+      section: "Section 3.1 (Working Hours)",
+      text: "Standard working hours shall be 9:30 AM to 6:30 PM, Monday through Friday.",
+    },
+    clauseB: {
+      section: "Section 5.1 (IP Assignment)",
+      text: "All worldwide rights in any inventions... conceived on personal time, using personal equipment, or otherwise.",
+    },
+    conflictAnalysis:
+      "Section 3 defines the official scope of duties, yet Section 5 claims personal creations completely outside working hours without company resources.",
+    recommendation:
+      "Attach a written Prior Inventions Schedule and limit IP assignment strictly to works created using company resources or directly relating to company business.",
+  },
+]
+
+export const sampleJargonList: JargonTranslation[] = [
+  {
+    id: "j-1",
+    originalClause: "The Employee agrees to defend, indemnify, and hold harmless the Company... against any and all losses, third-party legal claims, and coding defects.",
+    section: "Section 9.1 — Indemnification & Liability",
+    simplifiedExplanation: "If a client sues over software bugs or server downtime, the employer could try to make you pay for their legal costs and damages out of your personal pocket.",
+    whyThisMatters: "Individual salaried employees should almost never bear commercial liability for business operations without an explicit insurance cap.",
+    practicalExample: "If an outage results in a ₹10,00,000 SLA penalty from an enterprise client, ACME could try to deduct this from your final settlement.",
+  },
+  {
+    id: "j-2",
+    originalClause: "For a period of twenty-four (24) months post-termination, Employee shall not directly or indirectly accept employment with or consult for any SaaS competitor across India.",
+    section: "Section 6.1 — Non-Compete",
+    simplifiedExplanation: "They are trying to ban you from taking a job at any SaaS software company in the country for two whole years after resigning.",
+    whyThisMatters: "Under Section 27 of the Indian Contract Act, post-employment non-compete clauses are generally legally void as restraint of trade, but employers still use them to intimidate workers.",
+    practicalExample: "If you receive an offer from another tech firm in Bengaluru, HR might threaten legal notices based on this restrictive clause.",
+  },
+  {
+    id: "j-3",
+    originalClause: "In consideration of onboarding modules... if Employee departs prior to 12 months, liable to pay liquidated damages of INR 1,50,000.",
+    section: "Section 8.1 — Liquidated Damages",
+    simplifiedExplanation: "If you quit within your first year, you have to pay the company ₹1.5 Lakhs as a penalty fee for training and hiring replacement costs.",
+    whyThisMatters: "Under Indian labor law, training bonds can only recover actual, verifiable, extraordinary expenditure on certified third-party courses, not routine internal onboarding.",
+    practicalExample: "If your manager is toxic and you quit after 6 months, ACME will attempt to deduct ₹1,50,000 from your salary.",
+  },
+]
+
 export const documentLibrary: DocumentSummary[] = [
+  {
+    id: "acme-employment",
+    name: "ACME Technologies Employment Agreement.pdf",
+    type: "Employment Agreement",
+    sizeLabel: "248 KB",
+    status: "Analysis Complete",
+    uploadedAt: "Today, 11:15 AM",
+    reviewLevel: "Elevated",
+    clauseCount: 10,
+    concernCount: 6,
+    questionCount: 8,
+  },
   {
     id: "doc-employment-01",
     name: "Employment Agreement — Meridian Labs.pdf",
     type: "Employment Agreement",
-    sizeLabel: "248 KB",
+    sizeLabel: "180 KB",
     status: "Analysis Complete",
     uploadedAt: "Today, 10:24 AM",
     reviewLevel: "Moderate",

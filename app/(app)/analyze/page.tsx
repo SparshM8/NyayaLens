@@ -12,10 +12,12 @@ import {
   Upload,
   X,
   AlertCircle,
+  FileCode,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 
 const analysisSteps = [
@@ -52,10 +54,12 @@ const sampleDocs = [
 export default function AnalyzePage() {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
+  const [activeTab, setActiveTab] = useState<"upload" | "paste">("upload")
   const [dragging, setDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [selectedSampleId, setSelectedSampleId] = useState<string | null>(null)
+  const [pastedText, setPastedText] = useState("")
   const [stage, setStage] = useState<"idle" | "analyzing">("idle")
   const [activeStep, setActiveStep] = useState(0)
   const [progress, setProgress] = useState(0)
@@ -97,7 +101,19 @@ export default function AnalyzePage() {
 
       let res: Response
 
-      if (selectedFile) {
+      if (activeTab === "paste" && pastedText.trim()) {
+        res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(customKey ? { "x-gemini-api-key": customKey } : {}),
+          },
+          body: JSON.stringify({
+            text: pastedText.trim(),
+            fileName: fileName || "Pasted_Contract.txt",
+          }),
+        })
+      } else if (selectedFile) {
         const formData = new FormData()
         formData.append("file", selectedFile)
         res = await fetch("/api/analyze", {
@@ -140,7 +156,7 @@ export default function AnalyzePage() {
     } catch (err: any) {
       clearInterval(stepInterval)
       setStage("idle")
-      setError(err?.message || "Analysis failed. Please try again.")
+      setError(err?.message || "Analysis failed. Please check your document and try again.")
     }
   }
 
@@ -151,8 +167,8 @@ export default function AnalyzePage() {
           Analyze a document
         </h1>
         <p className="text-muted-foreground text-pretty">
-          Upload a contract, NDA, lease, or agreement. NyayaLens will read it and
-          explain what matters — in plain language.
+          Upload a contract or paste raw legal clauses. NyayaLens uses Google Gemini to read it and
+          explain what matters — highlighting risks, obligations, and next steps in plain language.
         </p>
       </div>
 
@@ -165,56 +181,106 @@ export default function AnalyzePage() {
 
       {stage === "idle" ? (
         <div className="mt-8 flex flex-col gap-6">
-          <Card className="overflow-hidden p-0">
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              onDragOver={(e) => {
-                e.preventDefault()
-                setDragging(true)
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault()
-                setDragging(false)
-                const f = e.dataTransfer.files?.[0]
-                if (f) pickFile(f)
-              }}
-              className={cn(
-                "flex w-full flex-col items-center gap-4 px-6 py-14 text-center transition-colors cursor-pointer",
-                dragging ? "bg-accent/60" : "bg-card hover:bg-muted/50",
-              )}
-            >
-              <span
-                className={cn(
-                  "flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-chart-3/15 text-primary transition-transform",
-                  dragging && "scale-110",
-                )}
-              >
-                <Upload className="size-7" />
-              </span>
-              <div className="flex flex-col gap-1">
-                <p className="text-base font-semibold text-foreground">
-                  {dragging ? "Drop your file to upload" : "Drag & drop your document here"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  or click to browse — PDF, DOCX, or TXT up to 25 MB
-                </p>
-              </div>
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.txt"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f) pickFile(f)
-                }}
-              />
-            </button>
-          </Card>
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as "upload" | "paste")}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2 max-w-xs mb-4">
+              <TabsTrigger value="upload" className="flex items-center gap-2">
+                <Upload className="size-3.5" />
+                Upload Document
+              </TabsTrigger>
+              <TabsTrigger value="paste" className="flex items-center gap-2">
+                <FileCode className="size-3.5" />
+                Paste Contract Text
+              </TabsTrigger>
+            </TabsList>
 
-          {fileName && (
+            <TabsContent value="upload">
+              <Card className="overflow-hidden p-0">
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    setDragging(true)
+                  }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setDragging(false)
+                    const f = e.dataTransfer.files?.[0]
+                    if (f) pickFile(f)
+                  }}
+                  className={cn(
+                    "flex w-full flex-col items-center gap-4 px-6 py-14 text-center transition-colors cursor-pointer",
+                    dragging ? "bg-accent/60" : "bg-card hover:bg-muted/50",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-chart-3/15 text-primary transition-transform",
+                      dragging && "scale-110",
+                    )}
+                  >
+                    <Upload className="size-7" />
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-base font-semibold text-foreground">
+                      {dragging ? "Drop your file to upload" : "Drag & drop your document here"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      or click to browse — PDF, DOCX, or TXT up to 25 MB
+                    </p>
+                  </div>
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.txt"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) pickFile(f)
+                    }}
+                  />
+                </button>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="paste">
+              <Card className="p-5 flex flex-col gap-3">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Paste contract, agreement, or clause text live (No pre-fill):
+                </label>
+                <textarea
+                  value={pastedText}
+                  onChange={(e) => {
+                    setPastedText(e.target.value)
+                    setFileName("Custom_Contract_Pasted.txt")
+                    setSelectedFile(null)
+                    setSelectedSampleId(null)
+                  }}
+                  placeholder="Paste contract clauses here... e.g. '1. Non-Compete: For 24 months following termination, Employee shall not directly or indirectly work for any competitor...'"
+                  rows={8}
+                  className="w-full rounded-xl border border-border bg-background p-3.5 text-xs sm:text-sm font-mono leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{pastedText.split(/\s+/).filter(Boolean).length} words</span>
+                  <Button
+                    size="sm"
+                    disabled={!pastedText.trim()}
+                    onClick={runAnalysis}
+                  >
+                    <Sparkles className="size-4 mr-1.5" />
+                    Analyze Pasted Text
+                  </Button>
+                </div>
+              </Card>
+            </TabsContent>
+          </Tabs>
+
+          {fileName && activeTab === "upload" && (
             <Card className="flex-row items-center justify-between gap-4 p-4">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -259,7 +325,7 @@ export default function AnalyzePage() {
                   type="button"
                   onClick={() => pickSample(doc)}
                   className={cn(
-                    "flex flex-col gap-2 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40 hover:bg-muted/40",
+                    "flex flex-col gap-2 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40 hover:bg-muted/40 cursor-pointer",
                     fileName === doc.name && "border-primary ring-2 ring-primary/20",
                   )}
                 >

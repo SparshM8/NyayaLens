@@ -6,7 +6,11 @@ export async function POST(req: NextRequest) {
   try {
     const customApiKey = req.headers.get('x-gemini-api-key') || undefined;
     const body = await req.json();
-    const { textA, textB, nameA, nameB, useSample } = body;
+    const useSample = body.useSample;
+    const textA = body.textA || body.versionA || '';
+    const textB = body.textB || body.versionB || '';
+    const nameA = body.nameA || body.titleA || 'Version A';
+    const nameB = body.nameB || body.titleB || 'Version B';
 
     if (useSample) {
       return NextResponse.json(SAMPLE_COMPARISON);
