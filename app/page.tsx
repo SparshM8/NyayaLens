@@ -1,281 +1,273 @@
-'use client';
+import Link from "next/link"
+import {
+  ArrowRight,
+  FileSearch,
+  Gauge,
+  GitCompare,
+  ListChecks,
+  Lock,
+  MessageSquareText,
+  ScrollText,
+  Sparkles,
+  Trash2,
+  Upload,
+} from "lucide-react"
+import { SiteHeader } from "@/components/marketing/site-header"
+import { SiteFooter } from "@/components/marketing/site-footer"
+import { HeroPreview } from "@/components/marketing/hero-preview"
+import { Disclaimer } from "@/components/disclaimer"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
-import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import UploadZone from '@/components/UploadZone';
-import SummaryOverview from '@/components/SummaryOverview';
-import ExplainLike18 from '@/components/ExplainLike18';
-import RiskCard from '@/components/RiskCard';
-import ClauseViewer from '@/components/ClauseViewer';
-import ObligationsList from '@/components/ObligationsList';
-import LawyerQuestions from '@/components/LawyerQuestions';
-import ChatPanel from '@/components/ChatPanel';
-import ArchitectureDiagram from '@/components/ArchitectureDiagram';
-import { DocumentAnalysis } from '@/lib/types';
-import { Sparkles, Shield, FileText, CheckCircle2, MessageSquare, AlertTriangle, ArrowRight, Gavel, Scale, GitCompare, Layers, BookOpen } from 'lucide-react';
-import Link from 'next/link';
+const steps = [
+  {
+    icon: Upload,
+    title: "Upload your document",
+    body: "Drop in a PDF, Word file, or plain text. Employment contracts, NDAs, leases, and more.",
+  },
+  {
+    icon: Sparkles,
+    title: "AI reads and explains it",
+    body: "Every clause is translated into plain language, so you understand what you are actually agreeing to.",
+  },
+  {
+    icon: ListChecks,
+    title: "Know what to ask",
+    body: "See what matters, what to review, and the exact questions to raise before you sign.",
+  },
+]
 
-export default function HomePage() {
-  const [analysis, setAnalysis] = useState<DocumentAnalysis | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'risks' | 'clauses' | 'obligations' | 'questions' | 'chat'>('overview');
+const capabilities = [
+  {
+    icon: ScrollText,
+    title: "Plain-language explanations",
+    body: "Dense legal language rewritten clearly, clause by clause, with the original text always one click away.",
+  },
+  {
+    icon: FileSearch,
+    title: "Clause-by-clause analysis",
+    body: "Each section is surfaced with why it matters, so nothing important slips past you.",
+  },
+  {
+    icon: Gauge,
+    title: "Review-level highlights",
+    body: "Neutral, non-alarming flags — Important, Needs Review, Potential Concern — never verdicts.",
+  },
+  {
+    icon: MessageSquareText,
+    title: "Ask your document",
+    body: "Type a question in natural language and get an answer grounded in the actual text.",
+  },
+  {
+    icon: ListChecks,
+    title: "Suggested questions",
+    body: "A ready-made checklist of questions to bring to the other party or your lawyer.",
+  },
+  {
+    icon: GitCompare,
+    title: "Compare versions",
+    body: "See exactly what changed between two drafts — added, removed, and modified terms.",
+  },
+]
 
-  const handleAnalysisComplete = (data: DocumentAnalysis) => {
-    setAnalysis(data);
-    setActiveTab('overview');
-    // Smooth scroll to top of cockpit
-    window.scrollTo({ top: 380, behavior: 'smooth' });
-  };
+const privacyPoints = [
+  {
+    icon: Lock,
+    title: "Private by default",
+    body: "Your documents are processed securely and never used to train models.",
+  },
+  {
+    icon: Trash2,
+    title: "You stay in control",
+    body: "Delete any document and its analysis at any time — it is gone for good.",
+  },
+  {
+    icon: ScrollText,
+    title: "Clear about limits",
+    body: "NyayaLens explains, it does not advise. We are always upfront that this is not legal counsel.",
+  },
+]
 
-  const handleReset = () => {
-    setAnalysis(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">
-      <Navbar />
+    <div className="flex min-h-dvh flex-col bg-background">
+      <SiteHeader />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Hero Section */}
-        {!analysis && (
-          <div className="text-center space-y-5 pt-8 pb-4 max-w-3xl mx-auto">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Next-Gen Legal Document Intelligence</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-              Understand Legal Documents{' '}
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-400 bg-clip-text text-transparent">
-                Without the Legal Jargon.
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="relative overflow-hidden">
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-gradient-to-b from-accent/60 to-transparent"
+            aria-hidden="true"
+          />
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:px-8 lg:py-24">
+            <div className="flex flex-col gap-6">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+                <Sparkles className="size-3.5 text-primary" />
+                AI-assisted document understanding
               </span>
-            </h1>
-
-            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              Upload a contract, agreement, or legal document and let AI explain what actually matters — highlighting risks, obligations, important clauses, and questions for your lawyer.
-            </p>
+              <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight text-foreground text-balance sm:text-5xl lg:text-6xl">
+                Understand legal documents.{" "}
+                <span className="bg-gradient-to-r from-primary via-chart-2 to-chart-3 bg-clip-text text-transparent">
+                  Know what matters.
+                </span>
+              </h1>
+              <p className="max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
+                NyayaLens reads contracts, NDAs, and agreements the way a careful
+                friend would — explaining each clause in plain language and showing you
+                exactly what to ask before you sign.
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button size="lg" nativeButton={false} render={
+                  <Link href="/analyze">
+                    Analyze a Document
+                    <ArrowRight data-icon="inline-end" />
+                  </Link>
+                } />
+                <Button variant="outline" size="lg" nativeButton={false} render={
+                  <Link href="/dashboard">See a sample analysis</Link>
+                } />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                No account needed to try. Informational only — not legal advice.
+              </p>
+            </div>
+            <HeroPreview />
           </div>
-        )}
+        </section>
 
-        {/* Upload Zone or Analyzed Dashboard */}
-        {!analysis ? (
-          <div className="max-w-4xl mx-auto">
-            <UploadZone onAnalysisComplete={handleAnalysisComplete} />
+        {/* How it works */}
+        <section id="how-it-works" className="border-t border-border bg-muted/20">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                From confusing to clear in three steps
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground text-pretty">
+                No legal background required. NyayaLens does the heavy reading and hands
+                you the understanding.
+              </p>
+            </div>
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {steps.map((step, i) => (
+                <Card key={step.title} className="gap-4 p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
+                      <step.icon className="size-5 text-primary" />
+                    </span>
+                    <span className="font-display text-sm font-medium text-muted-foreground">
+                      0{i + 1}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {step.body}
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
 
-            {/* How It Works Showcase */}
-            <div id="how-it-works" className="mt-20 space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  How NyayaLens Works
+        {/* Capabilities */}
+        <section id="capabilities">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                Everything you need to read with confidence
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground text-pretty">
+                Built to inform and empower — never to alarm or pretend to be your
+                lawyer.
+              </p>
+            </div>
+            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {capabilities.map((cap) => (
+                <Card
+                  key={cap.title}
+                  className="group gap-3 p-6 transition-colors hover:border-primary/40"
+                >
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <cap.icon className="size-5" />
+                  </span>
+                  <h3 className="mt-1 text-base font-semibold text-foreground">
+                    {cap.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {cap.body}
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Privacy */}
+        <section id="privacy" className="border-t border-border bg-muted/20">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+            <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
+              <div className="flex flex-col gap-4">
+                <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+                  <Lock className="size-3.5 text-primary" />
+                  Privacy & trust
+                </span>
+                <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                  Your documents stay yours
                 </h2>
-                <p className="text-sm text-slate-400 max-w-lg mx-auto">
-                  A grounded 3-step pipeline engineered for accuracy, risk transparency, and actionable legal preparedness.
+                <p className="text-lg text-muted-foreground text-pretty">
+                  Legal documents are personal. We treat them that way — with clear
+                  boundaries on what NyayaLens does and does not do.
                 </p>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-3 relative group hover:border-blue-500/40 transition">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-lg">
-                    1
-                  </div>
-                  <h3 className="text-base font-bold text-white">
-                    Upload &amp; Extract
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Drop any PDF, DOCX, or text contract. NyayaLens extracts the text stream, normalizes formatting, and maps sections without storing your files.
-                  </p>
-                </div>
-
-                <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-3 relative group hover:border-amber-500/40 transition">
-                  <div className="w-12 h-12 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-lg">
-                    2
-                  </div>
-                  <h3 className="text-base font-bold text-white">
-                    Gemini AI Synthesis
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Google Gemini identifies potential concerns, evaluates liability caps, decodes dense legalese into plain English, and structures actionable insights.
-                  </p>
-                </div>
-
-                <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-3 relative group hover:border-emerald-500/40 transition">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-lg">
-                    3
-                  </div>
-                  <h3 className="text-base font-bold text-white">
-                    Actionable Cockpit
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Interact with your document: Ask questions grounded in exact clauses, review flagged concerns, and copy prepared questions to bring to an attorney.
-                  </p>
-                </div>
-              </div>
-
-              {/* Quick Link to Contract Comparison */}
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-slate-900 border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="space-y-1 text-center sm:text-left">
-                  <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    Phase 2 Feature
-                  </span>
-                  <h4 className="text-lg font-bold text-white">
-                    Need to compare two drafts or counter-offers?
-                  </h4>
-                  <p className="text-xs text-slate-400">
-                    Use our Contract Comparison Studio to see side-by-side diffs (e.g. 30d vs 90d notice, ₹50k vs ₹75k pay).
-                  </p>
-                </div>
-
-                <Link
-                  href="/compare"
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/30 transition flex items-center space-x-1.5 shrink-0"
-                >
-                  <GitCompare className="w-4 h-4" />
-                  <span>Open Comparison Studio</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+              <div className="flex flex-col gap-4">
+                {privacyPoints.map((point) => (
+                  <Card key={point.title} className="flex-row items-start gap-4 p-5">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                      <point.icon className="size-5 text-primary" />
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-base font-semibold text-foreground">
+                        {point.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {point.body}
+                      </p>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </div>
           </div>
-        ) : (
-          /* Live Analyzed Actionable Legal Cockpit */
-          <div className="space-y-8 animate-fadeIn">
-            {/* Summary Overview */}
-            <SummaryOverview analysis={analysis} onReset={handleReset} />
+        </section>
 
-            {/* Navigation Tabs for Cockpit */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-800 scrollbar-none text-xs sm:text-sm no-print">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center space-x-2 whitespace-nowrap ${
-                  activeTab === 'overview'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Explain Like I&apos;m 18</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('risks')}
-                className={`px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center space-x-2 whitespace-nowrap ${
-                  activeTab === 'risks'
-                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
-                    : 'text-slate-400 hover:text-amber-400 hover:bg-slate-900'
-                }`}
-              >
-                <AlertTriangle className="w-4 h-4" />
-                <span>Potential Concerns ({analysis.riskFlags.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('clauses')}
-                className={`px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center space-x-2 whitespace-nowrap ${
-                  activeTab === 'clauses'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                <FileText className="w-4 h-4" />
-                <span>Clauses Explorer ({analysis.importantClauses.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('obligations')}
-                className={`px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center space-x-2 whitespace-nowrap ${
-                  activeTab === 'obligations'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                    : 'text-slate-400 hover:text-emerald-400 hover:bg-slate-900'
-                }`}
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Obligations &amp; Deadlines</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('questions')}
-                className={`px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center space-x-2 whitespace-nowrap ${
-                  activeTab === 'questions'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
-                    : 'text-slate-400 hover:text-purple-400 hover:bg-slate-900'
-                }`}
-              >
-                <Gavel className="w-4 h-4" />
-                <span>Questions for Lawyer</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('chat')}
-                className={`px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center space-x-2 whitespace-nowrap ${
-                  activeTab === 'chat'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                    : 'text-slate-400 hover:text-indigo-400 hover:bg-slate-900'
-                }`}
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Ask Your Document</span>
-              </button>
-            </div>
-
-            {/* Active Tab View */}
-            <div className="space-y-6">
-              {activeTab === 'overview' && (
-                <div className="space-y-8">
-                  <ExplainLike18 translations={analysis.explainLikeIm18} />
-                  <LawyerQuestions
-                    questions={analysis.questionsForLawyer}
-                    nextSteps={analysis.nextSteps}
-                  />
-                  <div className="mt-4">
-                    <h3 className="text-base font-bold text-white mb-3">
-                      Quick Document Q&amp;A
-                    </h3>
-                    <ChatPanel
-                      documentText={analysis.rawText}
-                      documentTitle={analysis.metadata.title}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'risks' && (
-                <div className="space-y-6">
-                  <RiskCard risks={analysis.riskFlags} />
-                  <LawyerQuestions
-                    questions={analysis.questionsForLawyer}
-                    nextSteps={analysis.nextSteps}
-                  />
-                </div>
-              )}
-
-              {activeTab === 'clauses' && (
-                <ClauseViewer clauses={analysis.importantClauses} />
-              )}
-
-              {activeTab === 'obligations' && (
-                <ObligationsList obligations={analysis.obligations} />
-              )}
-
-              {activeTab === 'questions' && (
-                <LawyerQuestions
-                  questions={analysis.questionsForLawyer}
-                  nextSteps={analysis.nextSteps}
-                />
-              )}
-
-              {activeTab === 'chat' && (
-                <ChatPanel
-                  documentText={analysis.rawText}
-                  documentTitle={analysis.metadata.title}
-                />
-              )}
-            </div>
+        {/* CTA */}
+        <section>
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+            <Card className="items-center gap-6 overflow-hidden bg-gradient-to-br from-primary to-chart-2 px-6 py-14 text-center text-primary-foreground">
+              <h2 className="max-w-2xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+                Have a document you need to understand?
+              </h2>
+              <p className="max-w-xl text-lg text-primary-foreground/80 text-pretty">
+                Upload it now and get a clear, clause-by-clause breakdown in moments.
+              </p>
+              <Button
+                size="lg"
+                variant="secondary"
+                nativeButton={false}
+                render={
+                  <Link href="/analyze">
+                    Analyze a Document
+                    <ArrowRight data-icon="inline-end" />
+                  </Link>
+                }
+              />
+            </Card>
+            <Disclaimer className="mt-8" />
           </div>
-        )}
+        </section>
       </main>
 
-      <Footer />
+      <SiteFooter />
     </div>
-  );
+  )
 }
