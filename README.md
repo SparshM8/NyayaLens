@@ -1,6 +1,6 @@
 # ⚖️ NyayaLens — AI Legal Document Copilot & Risk Engine
 
-> **NyayaLens turns complex legal documents into simple, actionable explanations while highlighting risks, obligations, important clauses, and next steps.**
+> **[NyayaLens turns complex legal documents into simple, actionable explanations while highlighting risks, obligations, important clauses, and next steps.](https://github.com/SparshM8/NyayaLens.git)**
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
 [![Google Gemini API](https://img.shields.io/badge/Google_Gemini-1.5_Flash-4285F4?logo=google)](https://aistudio.google.com/)
