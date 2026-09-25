@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚖️ NyayaLens — AI Legal Document Copilot & Risk Engine
 
-## Getting Started
+> **NyayaLens turns complex legal documents into simple, actionable explanations while highlighting risks, obligations, important clauses, and next steps.**
 
-First, run the development server:
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
+[![Google Gemini API](https://img.shields.io/badge/Google_Gemini-1.5_Flash-4285F4?logo=google)](https://aistudio.google.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🎯 Problem Statement & Positioning
+
+Legal agreements (employment contracts, NDAs, commercial leases, vendor contracts) are deliberately written in dense legalese that non-lawyers struggle to parse. This leads to hidden financial obligations, severe post-employment restrictions, and unbalanced liabilities.
+
+**NyayaLens solves this by acting as an AI Legal Document Copilot:**
+- It is **not** an automated lawyer asserting legal verdicts or unauthorized practice of law.
+- It is an **understanding and risk detection copilot** that translates jargon into plain English, flags potential concerns, and prepares focused questions for your legal professional.
+
+---
+
+## 🚀 Key Features
+
+| Feature | Description |
+| :--- | :--- |
+| 📄 **Document Extraction** | Instant text extraction from **PDF**, **DOCX**, and **TXT** files. |
+| 👶 **Explain Like I'm 18** | Visual before/after GenAI transformation converting dense legalese into plain English with practical real-world examples and why-this-matters context. |
+| ⚠️ **Risk & Concern Flags** | Categorized into *High*, *Medium*, and *Low* potential concerns with citations, financial exposure analysis, and clarification points. |
+| 📜 **Important Clauses Explorer** | Interactive category-based browser (Compensation, Termination, Non-Compete, IP, Indemnity, Dispute Resolution) with search and verbatim vs simplified toggles. |
+| 💬 **"Ask Your Document" Grounded Q&A** | Interactive chat grounded strictly in the document text with exact clause citations (e.g. *Clause 7.2, Clause 8.1*) and verification checklists. |
+| ⚖️ **Questions for Legal Professional** | Ready-to-ask questions generated specifically for your consultation with 1-click clipboard copy. |
+| 📅 **Obligations & Deadlines Checklist** | Interactive tracking checklist of active compliance duties and breach consequences. |
+| 🔄 **Contract Comparison Studio** | Side-by-side comparative analysis of two contract drafts (e.g. *Version A vs Version B*) highlighting notice period deltas, newly added covenants, and compensation changes. |
+| ⚡ **Instant Demo Mode** | Pre-loaded with realistic contracts (*ACME Tech Employment Agreement* with 90-day notice, 24-month non-compete, ₹1.5L bond; *Nexus Consultant NDA*) so anyone can test the system in 1-click without setup. |
+
+---
+
+## 🏗️ GenAI Architecture & Technical Pipeline
+
+```text
+                 ┌──────────────────────────────────────┐
+                 │          User Upload File            │
+                 │          PDF / DOCX / TXT            │
+                 └──────────────────┬───────────────────┘
+                                    │
+                                    ▼
+                 ┌──────────────────────────────────────┐
+                 │         Text Extraction Layer        │
+                 │      pdf-parse + Stream Decoders     │
+                 └──────────────────┬───────────────────┘
+                                    │
+                                    ▼
+                 ┌──────────────────────────────────────┐
+                 │       Semantic Clause Chunker        │
+                 │ Boundary Detection & Token Allocation│
+                 └──────────────────┬───────────────────┘
+                                    │
+                                    ▼
+                 ┌──────────────────────────────────────┐
+                 │       Google Gemini 1.5 Flash        │
+                 │    Structured JSON Schema Mode       │
+                 └──────────────────┬───────────────────┘
+                                    │
+            ┌───────────────────────┼───────────────────────┐
+            ▼                       ▼                       ▼
+     Simplification          Risk Detection             Grounded
+   "Explain Like 18"       Potential Concerns         Ask Your Doc
+   (Jargon Translator)     (Indian Contract Act)     (Clause Citations)
+            │                       │                       │
+            └───────────────────────┼───────────────────────┘
+                                    ▼
+                 ┌──────────────────────────────────────┐
+                 │        Actionable Legal Cockpit      │
+                 │  • Executive Plain-English Summary   │
+                 │  • Risk Score & Meter (0-100)        │
+                 │  • Clauses & Obligations Explorer    │
+                 │  • Questions for Legal Counsel       │
+                 │  • Contract Comparison Studio        │
+                 └──────────────────────────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⏱️ The 4-Minute Demo Video Walkthrough Schedule
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Built specifically to fulfill the hackathon demo video requirements:
 
-## Learn More
+| Time | Segment | What to Show | Narration / Key Point |
+| :---: | :---: | :---: | :--- |
+| **0:00–0:20** | **The Problem** | Landing Page Hero | "Legal documents are full of jargon. NyayaLens turns them into simple, actionable intelligence." |
+| **0:20–0:50** | **Live Upload** | Upload Box / Sample Selector | Click *ACME Technologies Employment Agreement*. Show live extraction and Gemini analysis. |
+| **0:50–1:30** | **AI Summary** | Cockpit Top & Risk Meter | Show Risk Level (HIGH: 78/100), CTC (₹18L), parties, read time, and plain English overview. |
+| **1:30–2:20** | **Ask Your Document** | Grounded Q&A | Click *"What happens if I leave before 1 year?"* Show Gemini response citing *Clause 7.2*, *Clause 8.1*, and the *₹1,50,000* training bond. |
+| **2:20–3:00** | **Risk & Legalese** | "Explain Like I'm 18" & Risk Cards | Inspect uncapped indemnity and 24-month non-compete. Highlight why it matters to an employee. |
+| **3:00–3:30** | **Lawyer Preparation** | Questions for Lawyer | Demonstrate 1-click **Copy Questions** to take directly to an advocate. |
+| **3:30–3:50** | **Contract Compare** | `/compare` Page | Side-by-side diff: Notice tripled (30d → 90d), new 12-month non-compete, pay increased (₹50k → ₹75k). |
+| **3:50–4:00** | **Architecture** | `/architecture` Page | Review end-to-end pipeline: Ingestion → Gemini Flash → JSON Schema → Cockpit. |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack, Server Actions)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with custom legal-tech glassmorphism
+- **AI Model**: [Google Gemini 1.5 Flash](https://aistudio.google.com/) via `@google/generative-ai`
+- **Document Ingestion**: `pdf-parse` & UTF-8 stream normalizer
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 💻 Local Setup & Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. Clone the repository
+\`\`\`bash
+git clone https://github.com/your-username/nyayalens.git
+cd nyayalens
+\`\`\`
+
+### 2. Install dependencies
+\`\`\`bash
+npm install
+\`\`\`
+
+### 3. (Optional) Configure Gemini API Key
+Create a `.env.local` file in the root directory:
+\`\`\`env
+GEMINI_API_KEY=your_gemini_api_key_here
+\`\`\`
+> **Note**: You can also enter your Gemini API key directly in the web UI via the key button in the top navigation bar, or run directly in **Instant Demo Mode** without any key!
+
+### 4. Run development server
+\`\`\`bash
+npm run dev
+\`\`\`
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 5. Build for production
+\`\`\`bash
+npm run build
+npm run start
+\`\`\`
+
+---
+
+## 🛡️ Responsible AI & Ethical Legal Positioning
+
+NyayaLens includes clear disclaimers across all screens:
+> *"Information provided by NyayaLens is for informational and document understanding purposes only and does not constitute formal legal advice. Always consult a qualified advocate or attorney for legal matters."*
+
+All AI-generated flags are styled as **"⚠️ Potential Concerns"** with recommended clarification questions rather than claiming illegality, preserving professional legal workflows.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
