@@ -190,3 +190,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  /* Hide navigation, footers, buttons, and interactive widgets during print */
+  header,
+  footer,
+  nav,
+  button,
+  input,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Ensure colors and borders render on physical page or PDF */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-shadow: none !important;
+  }
+
+  /* Prevent awkward page breaks inside content cards */
+  article, section, .card, [class*="rounded-xl"], [class*="border"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

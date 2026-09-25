@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Copy, Download, Star, Check } from "lucide-react"
+import { Copy, Download, Star, Check, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -52,6 +52,12 @@ export function QuestionsChecklist({ customQuestions }: QuestionsChecklistProps)
     URL.revokeObjectURL(url)
   }
 
+  function handlePrint() {
+    if (typeof window !== "undefined") {
+      window.print()
+    }
+  }
+
   return (
     <Card>
       <CardHeader className="flex-row items-start justify-between gap-4">
@@ -65,7 +71,7 @@ export function QuestionsChecklist({ customQuestions }: QuestionsChecklistProps)
             off as you go.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleCopyAll}>
             {copied ? (
               <Check className="size-4 mr-1 text-review-low" />
@@ -76,7 +82,11 @@ export function QuestionsChecklist({ customQuestions }: QuestionsChecklistProps)
           </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="size-4 mr-1" />
-            Export
+            Export .md
+          </Button>
+          <Button variant="default" size="sm" onClick={handlePrint} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Printer className="size-4 mr-1" />
+            Print Brief / PDF
           </Button>
         </div>
       </CardHeader>
