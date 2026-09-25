@@ -4,7 +4,19 @@ import { DOCUMENT_ANALYSIS_SYSTEM_PROMPT, CHAT_SYSTEM_PROMPT, COMPARISON_SYSTEM_
 import { ACME_ANALYSIS, CONSULTANT_ANALYSIS } from './sampleDocuments';
 import { SAMPLE_COMPARISON } from './comparisonSamples';
 
-export const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+export const CANDIDATE_GEMINI_MODELS = Array.from(
+  new Set(
+    [
+      process.env.GEMINI_MODEL,
+      'gemini-3.8-flash',
+      'gemini-3.6-flash',
+      'gemini-3.1-flash',
+      'gemini-2.5-flash',
+    ].filter(Boolean) as string[]
+  )
+);
+
+export const DEFAULT_GEMINI_MODEL = CANDIDATE_GEMINI_MODELS[0] || 'gemini-3.8-flash';
 
 export function getGeminiClient(customApiKey?: string): GoogleGenerativeAI | null {
   const apiKey = customApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -29,6 +41,39 @@ function cleanJsonOutput(raw: string): string {
 }
 
 /**
+ * Executes a generation request trying candidate models in sequence
+ * (e.g. gemini-3.8-flash -> gemini-3.6-flash -> gemini-3.1-flash)
+ */
+async function callGeminiWithModelFallback(
+  genAI: GoogleGenerativeAI,
+  prompt: string,
+  options?: { responseMimeType?: string; temperature?: number }
+): Promise<{ text: string; modelUsed: string }> {
+  let lastError: any = null;
+
+  for (const modelName of CANDIDATE_GEMINI_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          ...(options?.responseMimeType ? { responseMimeType: options.responseMimeType } : {}),
+          ...(typeof options?.temperature === 'number' ? { temperature: options.temperature } : {}),
+        },
+      });
+
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      return { text, modelUsed: modelName };
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`Model ${modelName} encountered issue, attempting next candidate:`, err?.message || err);
+    }
+  }
+
+  throw lastError || new Error('All candidate Gemini models failed.');
+}
+
+/**
  * Analyze document text using Google Gemini or intelligent fallback
  */
 export async function analyzeDocumentWithGemini(
@@ -41,18 +86,13 @@ export async function analyzeDocumentWithGemini(
   // If Gemini client is available, try live API call
   if (genAI) {
     try {
-      const model = genAI.getGenerativeModel({
-        model: DEFAULT_GEMINI_MODEL,
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.2,
-        },
-      });
-
       const prompt = `${DOCUMENT_ANALYSIS_SYSTEM_PROMPT}\n\nDocument File Name: "${fileName}"\n\n--- DOCUMENT TEXT START ---\n${text.slice(0, 35000)}\n--- DOCUMENT TEXT END ---`;
 
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      const { text: responseText, modelUsed } = await callGeminiWithModelFallback(genAI, prompt, {
+        responseMimeType: 'application/json',
+        temperature: 0.2,
+      });
+
       const cleaned = cleanJsonOutput(responseText);
       const parsed = JSON.parse(cleaned);
 
@@ -82,10 +122,10 @@ export async function analyzeDocumentWithGemini(
         nextSteps: parsed.nextSteps || [],
         generatedAt: new Date().toISOString(),
         isAiGenerated: true,
-        modelUsed: `Google Gemini (${DEFAULT_GEMINI_MODEL})`,
+        modelUsed: `Google Gemini (${modelUsed})`,
       };
     } catch (err) {
-      console.warn('Gemini API call failed or rate-limited, engaging intelligent legal analysis engine:', err);
+      console.warn('All Gemini models failed or rate-limited, engaging intelligent legal analysis engine:', err);
       // Fall through to intelligent local analyzer
     }
   }
@@ -328,13 +368,6 @@ export async function chatWithDocument(
 
   if (genAI) {
     try {
-      const model = genAI.getGenerativeModel({
-        model: DEFAULT_GEMINI_MODEL,
-        generationConfig: {
-          temperature: 0.1,
-        },
-      });
-
       const historyFormatted = chatHistory
         .slice(-6)
         .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
@@ -354,8 +387,9 @@ User Question: "${question}"
 
 Provide a grounded, accurate response referencing exact clauses and stating what to verify.`;
 
-      const result = await model.generateContent(prompt);
-      const answer = result.response.text();
+      const { text: answer } = await callGeminiWithModelFallback(genAI, prompt, {
+        temperature: 0.1,
+      });
 
       // Extract clause mentions if possible
       const clauseMatches = answer.match(/(?:Section|Clause|Article)\s*[\d\.]+/gi) || [];
@@ -367,7 +401,7 @@ Provide a grounded, accurate response referencing exact clauses and stating what
         whatToVerify: 'Verify exact dates, notice requirements, and exceptions with a legal professional.',
       };
     } catch (err) {
-      console.warn('Gemini chat error, falling back to document search engine:', err);
+      console.warn('Gemini chat error across all candidate models, falling back to document search engine:', err);
     }
   }
 
@@ -465,14 +499,6 @@ export async function compareContractsWithGemini(
 
   if (genAI) {
     try {
-      const model = genAI.getGenerativeModel({
-        model: DEFAULT_GEMINI_MODEL,
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.1,
-        },
-      });
-
       const prompt = `${COMPARISON_SYSTEM_PROMPT}
 
 CONTRACT VERSION A ("${nameA}"):
@@ -487,8 +513,12 @@ ${textB.slice(0, 18000)}
 
 Generate side-by-side clause comparison and negotiation advice.`;
 
-      const result = await model.generateContent(prompt);
-      const parsed = JSON.parse(cleanJsonOutput(result.response.text()));
+      const { text: responseText } = await callGeminiWithModelFallback(genAI, prompt, {
+        responseMimeType: 'application/json',
+        temperature: 0.1,
+      });
+
+      const parsed = JSON.parse(cleanJsonOutput(responseText));
       return {
         docAName: nameA,
         docBName: nameB,
@@ -499,7 +529,7 @@ Generate side-by-side clause comparison and negotiation advice.`;
         negotiationRecommendations: parsed.negotiationRecommendations || [],
       };
     } catch (err) {
-      console.warn('Gemini contract comparison error, using comparison test suite:', err);
+      console.warn('Gemini contract comparison error across all candidate models, using comparison test suite:', err);
     }
   }
 
