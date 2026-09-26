@@ -69,7 +69,7 @@ Legal agreements (employment contracts, NDAs, commercial leases, vendor contract
 
 | Criterion | Requirement | NyayaLens Implementation | Status |
 | :--- | :--- | :--- | :---: |
-| **Deployed Prototype Link** | Live URL Required | Next.js production build tested; 1-click deploy to Vercel/Render | ✅ Ready |
+| **Deployed Prototype Link** | Live URL Required | [https://nyaya-lens-blue.vercel.app/](https://nyaya-lens-blue.vercel.app/) | ✅ Deployed & Live |
 | **GitHub Repo Link** | Public & strictly < 10 MB | Git object size is **~360 KB** (excludes build artifacts via `.gitignore`) | ✅ Passed (~0.36 MB) |
 | **Project Description** | Brief Overview & Problem | Clear, concise description of accessible legal copilot & problem statement | ✅ Complete |
 | **GenAI Architecture** | Explicit Mapping | Full architectural diagram + explicit endpoint & prompt schema documentation | ✅ Complete (`/architecture`) |
