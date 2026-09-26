@@ -70,10 +70,29 @@ export default function SettingsPage() {
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
   const [serverStatus, setServerStatus] = useState<{ hasServerKey: boolean; model: string; message: string } | null>(null)
 
+  // Profile states
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [profileName, setProfileName] = useState("Priya Sharma")
+  const [profileEmail, setProfileEmail] = useState("priya.s@example.com")
+  const [profileRole, setProfileRole] = useState("Legal Operations / Reviewer")
+  const [profileSaved, setProfileSaved] = useState(false)
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("NYAYALENS_GEMINI_API_KEY") || ""
       setApiKey(stored)
+
+      const storedProfile = localStorage.getItem("NYAYALENS_USER_PROFILE")
+      if (storedProfile) {
+        try {
+          const parsed = JSON.parse(storedProfile)
+          if (parsed.name) setProfileName(parsed.name)
+          if (parsed.email) setProfileEmail(parsed.email)
+          if (parsed.role) setProfileRole(parsed.role)
+        } catch {
+          // ignore
+        }
+      }
     }
 
     fetch("/api/status")
@@ -81,6 +100,21 @@ export default function SettingsPage() {
       .then((data) => setServerStatus(data))
       .catch((err) => console.warn("Status check failed:", err))
   }, [])
+
+  function handleSaveProfile() {
+    if (typeof window !== "undefined") {
+      const profileData = {
+        name: profileName.trim() || "Priya Sharma",
+        email: profileEmail.trim() || "priya.s@example.com",
+        role: profileRole.trim() || "Legal Operations / Reviewer",
+      }
+      localStorage.setItem("NYAYALENS_USER_PROFILE", JSON.stringify(profileData))
+      window.dispatchEvent(new Event("storage"))
+    }
+    setProfileSaved(true)
+    setIsEditingProfile(false)
+    setTimeout(() => setProfileSaved(false), 2500)
+  }
 
   function handleSaveKey() {
     if (typeof window !== "undefined") {
@@ -260,36 +294,115 @@ export default function SettingsPage() {
         {/* Account */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <User className="size-5 text-primary" />
-              Account
+            <CardTitle className="flex items-center justify-between text-base">
+              <span className="flex items-center gap-2">
+                <User className="size-5 text-primary" />
+                Account Profile
+              </span>
+              {profileSaved && (
+                <span className="text-xs text-review-low font-medium flex items-center gap-1">
+                  <CheckCircle className="size-3.5" /> Profile updated!
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <div className="flex items-center gap-4">
-              <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 font-display text-lg font-semibold text-primary">
-                PS
-              </span>
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-foreground">Priya Sharma</span>
-                <span className="text-sm text-muted-foreground">priya.s@example.com</span>
+            {!isEditingProfile ? (
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 font-display text-lg font-semibold text-primary">
+                  {profileName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .substring(0, 2)
+                    .toUpperCase() || "PS"}
+                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-foreground">{profileName}</span>
+                  <span className="text-sm text-muted-foreground">{profileEmail}</span>
+                  <span className="text-xs text-muted-foreground/80 mt-0.5">{profileRole}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditingProfile(true)}
+                  className="ml-auto cursor-pointer"
+                >
+                  Edit profile
+                </Button>
               </div>
-              <Button variant="outline" size="sm" className="ml-auto">
-                Edit profile
-              </Button>
-            </div>
+            ) : (
+              <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/20 p-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Update Profile Information
+                </h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="profile-name" className="text-xs">
+                      Full Name
+                    </Label>
+                    <Input
+                      id="profile-name"
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      placeholder="e.g. Priya Sharma"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="profile-email" className="text-xs">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="profile-email"
+                      type="email"
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      placeholder="user@example.com"
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="profile-role" className="text-xs">
+                    Professional Role / Title
+                  </Label>
+                  <Input
+                    id="profile-role"
+                    value={profileRole}
+                    onChange={(e) => setProfileRole(e.target.value)}
+                    placeholder="e.g. Legal Operations / Freelance Reviewer"
+                    className="text-sm"
+                  />
+                </div>
+                <div className="flex items-center gap-2 pt-2">
+                  <Button size="sm" onClick={handleSaveProfile} className="cursor-pointer">
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditingProfile(false)}
+                    className="cursor-pointer"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <Separator />
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Globe className="size-4 text-muted-foreground" />
                 <div className="flex flex-col">
-                  <Label className="text-sm font-medium">Language</Label>
+                  <Label className="text-sm font-medium">Interface Language</Label>
                   <span className="text-xs text-muted-foreground">
                     Explanations are generated in this language
                   </span>
                 </div>
               </div>
-              <span className="text-sm font-medium text-foreground">English</span>
+              <span className="text-sm font-medium text-foreground">English (Indian Legal Context)</span>
             </div>
           </CardContent>
         </Card>
