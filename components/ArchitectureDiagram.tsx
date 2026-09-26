@@ -31,7 +31,7 @@ export default function ArchitectureDiagram() {
       subtitle: 'Structured Extraction & Simplification',
       icon: Cpu,
       color: 'purple',
-      description: 'Google Gemini 1.5 Flash generates grounded interpretations adhering strictly to structured JSON schemas. Produces plain English translations, potential concern flags, and specific advocate questions.',
+      description: 'Google Gemini 3.8 Flash generates grounded interpretations adhering strictly to structured JSON schemas. Produces plain English translations, potential concern flags, and specific advocate questions.',
       techStack: ['Google Gemini API', '@google/generative-ai', 'Structured JSON Schema Mode'],
     },
     {
@@ -176,7 +176,7 @@ export default function ArchitectureDiagram() {
    [Semantic Clause Chunker] ──> [Token Optimization Window]
           │
           ▼
-   [Google Gemini 1.5 Flash] ──> [Enforced JSON Schema Prompt]
+   [Google Gemini 3.8 Flash] ──> [Enforced JSON Schema Prompt]
           │
           ├─────────────────────┼─────────────────────┐
           ▼                     ▼                     ▼

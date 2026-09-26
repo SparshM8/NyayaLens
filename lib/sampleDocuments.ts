@@ -354,7 +354,7 @@ export const ACME_ANALYSIS: DocumentAnalysis = {
   ],
   generatedAt: new Date().toISOString(),
   isAiGenerated: true,
-  modelUsed: 'Google Gemini 1.5 Flash (Legal Grounding Engine)',
+  modelUsed: 'Google Gemini 3.8 Flash (Legal Grounding Engine)',
 };
 
 export const CONSULTANT_NDA_TEXT = `MUTUAL NON-DISCLOSURE AND INTELLECTUAL PROPERTY AGREEMENT
@@ -486,7 +486,7 @@ export const CONSULTANT_ANALYSIS: DocumentAnalysis = {
   ],
   generatedAt: new Date().toISOString(),
   isAiGenerated: true,
-  modelUsed: 'Google Gemini 1.5 Flash (Legal Grounding Engine)',
+  modelUsed: 'Google Gemini 3.8 Flash (Legal Grounding Engine)',
 };
 
 export const SAMPLE_DOCUMENTS: SampleDoc[] = [

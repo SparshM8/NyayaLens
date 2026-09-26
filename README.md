@@ -3,7 +3,7 @@
 > **[NyayaLens turns complex legal documents into simple, actionable explanations while highlighting risks, obligations, important clauses, and next steps.](https://github.com/SparshM8/NyayaLens.git)**
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
-[![Google Gemini API](https://img.shields.io/badge/Google_Gemini-1.5_Flash-4285F4?logo=google)](https://aistudio.google.com/)
+[![Google Gemini API](https://img.shields.io/badge/Google_Gemini-3.8_Flash-4285F4?logo=google)](https://aistudio.google.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -105,7 +105,7 @@ Legal agreements (employment contracts, NDAs, commercial leases, vendor contract
                                     │
                                     ▼
                  ┌──────────────────────────────────────┐
-                 │       Google Gemini 1.5 Flash        │
+                 │       Google Gemini 3.8 / 3.6 Flash        │
                  │    Structured JSON Schema Mode       │
                  └──────────────────┬───────────────────┘
                                     │
@@ -151,7 +151,7 @@ Built specifically to fulfill the hackathon demo video requirements:
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack, Server Actions)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with custom legal-tech glassmorphism
-- **AI Model**: [Google Gemini 1.5 Flash](https://aistudio.google.com/) via `@google/generative-ai`
+- **AI Model**: [Google Gemini 3.8 & 3.6 Flash](https://aistudio.google.com/) via `@google/generative-ai`
 - **Document Ingestion**: `pdf-parse` & UTF-8 stream normalizer
 - **Icons**: [Lucide React](https://lucide.dev/)
 

@@ -141,7 +141,7 @@ export default function ComparePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <Sparkles className="size-4 text-primary" />
-              Live Contract Diff Engine (Gemini 1.5 Flash)
+              Live Contract Diff Engine (Gemini 3.8 Flash)
             </div>
             <Button
               variant="outline"

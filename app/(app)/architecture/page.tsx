@@ -91,7 +91,7 @@ export default function ArchitecturePage() {
                   <td className="py-3 px-4 font-mono font-medium text-primary">0:20 – 0:50</td>
                   <td className="py-3 px-4 font-semibold text-foreground">Live Upload</td>
                   <td className="py-3 px-4">Upload Box / ACME Contract</td>
-                  <td className="py-3 px-4">Extracting text, chunking clauses, and invoking Gemini 1.5 Flash live.</td>
+                  <td className="py-3 px-4">Extracting text, chunking clauses, and invoking Gemini 3.8 Flash live.</td>
                 </tr>
                 <tr>
                   <td className="py-3 px-4 font-mono font-medium text-primary">0:50 – 1:30</td>
