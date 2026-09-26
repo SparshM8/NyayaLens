@@ -20,6 +20,34 @@ Legal agreements (employment contracts, NDAs, commercial leases, vendor contract
 
 ---
 
+## 📌 Challenge Specifications & Solution Blueprint
+
+### 1. Chosen Vertical & Target Persona
+- **Vertical**: **AI for Legal Assistance & Access** (Theme: Making legal information and basic legal assistance accessible, understandable, and navigable).
+- **Target Persona**: Everyday employees, freelancers, gig workers, small business owners, and non-lawyers who receive contracts, agreements, or legal policies and need immediate clarity before signing.
+- **Core Role**: An AI Legal Document Copilot that provides plain-language translation, risk detection, inconsistency analysis, and lawyer consultation prep—operating strictly within educational and informational boundaries.
+
+### 2. Approach and Logic
+- **Structured Semantic Decomposition**: Rather than generating unstructured summaries, NyayaLens breaks contracts down into atomic clauses (Compensation, Termination, Non-Compete, IP Assignment, Indemnity, Dispute Resolution).
+- **Dual-Model GenAI Pipeline**: Powered by Google Gemini (`gemini-3.8-flash` & `gemini-3.6-flash`) with transparent multi-model fallback for high resilience and zero downtime.
+- **Strict Grounding & Anti-Hallucination**: Q&A responses are strictly grounded in document text with explicit citations (e.g., `Clause 7.2`, `Clause 8.1`) and verification checklists.
+- **Cross-Clause Inconsistency Detection**: Compares clauses against each other (e.g. 24h employer termination vs 90d employee notice) to detect unilateral contractual bias.
+- **Advocate Consultation Preparation**: Bridges the gap between citizens and legal counsel by generating prioritized questions for advocates with 1-click Markdown export and print-ready PDF styling.
+
+### 3. How the Solution Works
+1. **Document Ingestion**: Accepts PDF, DOCX, TXT files, or Live Text Paste via a clean dual-mode intake.
+2. **GenAI Analysis Pipeline**: Employs Google Gemini with structured JSON Schema mode to compute review levels (*Low*, *Moderate*, *Elevated*), detect risks, and translate legalese into plain English.
+3. **Interactive Legal Cockpit**: Users explore clauses, review contradictions, chat with the document, and track active compliance obligations.
+4. **Contract Comparison Studio**: Diffs Version A vs Version B to highlight contractual drift, increased liabilities, and negotiation leverage.
+
+### 4. Assumptions Made
+1. **Informational Boundary**: Assumes users require document comprehension and risk identification, not formal legal representation or legal verdicts.
+2. **Standard Document Formats**: Assumes documents are written in English in common text or standard digital PDF format.
+3. **Jurisdiction Sensitivity**: Assumes general contract law principles with specific statutory cross-references (e.g., Section 27 of the Indian Contract Act regarding post-employment covenants) provided as discussion points for counsel.
+4. **Evaluator Testing Rules**: Assumes evaluators require zero-prefill live testing; hence, a Live Text Paste Mode and instant demo presets are provided.
+
+---
+
 ## 🚀 Key Features
 
 | Feature | Description |
