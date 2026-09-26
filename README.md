@@ -52,6 +52,11 @@ Legal agreements (employment contracts, NDAs, commercial leases, vendor contract
 
 | Feature | Description |
 | :--- | :--- |
+| 🎓 **Dynamic Persona Lens** | **Context-Aware Assistant** that dynamically customizes risk severity, primary legal warnings, and tactical negotiation moves for **First-Time Employees**, **Freelancers**, **Startup Founders**, and **Legal Counsel**. |
+| ⚖️ **AI Clause Redlining & Counter-Proposals** | Generates legally-grounded, balanced replacement clauses backed by **Indian Statutory Precedents** (e.g., Section 27 Indian Contract Act 1872, Perkins Eastman arbitration ruling) with 1-click copy for instant contract negotiation. |
+| 🔊 **Voice Audio Accessibility Engine** | Native browser **Web SpeechSynthesis** integration allowing users to click "Listen (Audio)" on any clause or "Explain Like I'm 18" translation to hear plain English explanations read aloud. |
+| 📊 **Multi-Dimensional Risk Health Radar** | Quantifiable scorecard evaluating **Statutory Enforceability**, **Financial Liability Exposure (Clawbacks)**, **Notice Symmetry**, and **IP Freedom Score**. |
+| 📥 **1-Click Advocate Consultation Brief** | Exports a structured, print-ready or downloadable Markdown brief containing Executive Summary, Persona Alerts, Flagged Risks, and Prioritized Advocate Questions. |
 | 📄 **Dual-Mode Document Ingestion** | Instant text extraction from **PDF**, **DOCX**, and **TXT** files, PLUS a **Live Paste Text Mode** for on-screen live contract input without pre-filled forms. |
 | 👶 **Explain Like I'm 18** | Visual before/after GenAI transformation converting dense legalese into plain English with practical real-world examples and why-this-matters context. |
 | ⚠️ **Risk & Review Badges** | Categorized into *High*, *Moderate*, and *Low* review levels with citations, financial exposure analysis, and clarification points. |
@@ -59,9 +64,8 @@ Legal agreements (employment contracts, NDAs, commercial leases, vendor contract
 | 📜 **Important Clauses Explorer** | Interactive category-based browser (Compensation, Termination, Non-Compete, IP, Indemnity, Dispute Resolution) with search and verbatim vs simplified toggles. |
 | 💬 **"Ask Your Document" Grounded Q&A** | Interactive chat grounded strictly in the document text with exact clause citations (e.g. *Clause 7.2, Clause 8.1*) and verification checklists. |
 | 📋 **Questions for Legal Professional** | Ready-to-ask questions generated specifically for your consultation with 1-click clipboard copy and Markdown checklist export. |
-| 📅 **Obligations & Deadlines Checklist** | Interactive tracking checklist of active compliance duties, party responsibilities, and breach consequences. |
 | 🔄 **Contract Comparison Studio** | Side-by-side comparative analysis of two contract drafts with **Live AI Comparison** mode to compare any two contract drafts dynamically. |
-| ⚡ **Instant Demo Mode** | Pre-loaded with realistic contracts (*ACME Tech Employment Agreement*, *Meridian Labs*, *Nexus NDA*) so anyone can test in 1-click without API key setup. |
+| ⚡ **Instant Demo Mode** | Pre-loaded with realistic contracts (*ACME Tech Employment Agreement*, *Nexus Consultant NDA*, *Meridian Labs*) so anyone can test in 1-click without API key setup. |
 
 ---
 

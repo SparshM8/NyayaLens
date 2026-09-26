@@ -1,11 +1,25 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { ChevronRight, FileText, HelpCircle, Quote, Search, Star, X } from "lucide-react"
+import {
+  ChevronRight,
+  FileText,
+  HelpCircle,
+  Quote,
+  Search,
+  Scale,
+  Copy,
+  Check,
+  Sparkles,
+  X,
+  ShieldAlert,
+} from "lucide-react"
 import { ReviewBadge } from "@/components/review-badge"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { VoiceNarrator } from "@/components/voice-narrator"
 import { clauses as defaultClauses, type Clause } from "@/lib/sample-data"
+import { CLAUSE_COUNTER_PROPOSALS, type CounterProposal } from "@/lib/clauseEnhancements"
 import { cn } from "@/lib/utils"
 
 interface ClauseExplorerProps {
@@ -17,6 +31,8 @@ export function ClauseExplorer({ customClauses }: ClauseExplorerProps) {
   const [selectedId, setSelectedId] = useState(activeClauses[0]?.id || "")
   const [searchQuery, setSearchQuery] = useState("")
   const [filterLevel, setFilterLevel] = useState<string>("all")
+  const [showCounterProposal, setShowCounterProposal] = useState(false)
+  const [copiedCounter, setCopiedCounter] = useState(false)
 
   const filteredClauses = useMemo(() => {
     return activeClauses.filter((c) => {
@@ -39,11 +55,44 @@ export function ClauseExplorer({ customClauses }: ClauseExplorerProps) {
     filteredClauses[0] ??
     activeClauses[0]
 
+  // Find relevant counter-proposal if available
+  const counterProposal: CounterProposal | null = useMemo(() => {
+    if (!selected) return null
+    for (const [key, prop] of Object.entries(CLAUSE_COUNTER_PROPOSALS)) {
+      if (
+        selected.title.toLowerCase().includes(key.toLowerCase()) ||
+        selected.section.toLowerCase().includes(key.toLowerCase()) ||
+        selected.originalText.toLowerCase().includes(key.toLowerCase())
+      ) {
+        return prop
+      }
+    }
+    // Generic fallback for any high-risk clause
+    if (selected.level === "potential-concern" || selected.level === "needs-review") {
+      return {
+        clauseTitle: selected.title,
+        originalSnippet: selected.originalText.slice(0, 150) + "...",
+        proposedReplacement: `Mutual & Balanced Standard: The provisions of this Section shall apply reciprocally to both parties, subject to a standard thirty (30) days' cure period following written notice. Liability shall be limited to actual verified direct damages and exclude speculative or consequential losses.`,
+        statutoryBasis: "Section 73 of the Indian Contract Act 1872 limits damages to direct natural losses rather than speculative penalties.",
+        negotiationRationale: "Establishes bilateral fairness, adds a mandatory cure period, and removes punitive one-sided penalties.",
+        impactLevel: "Medium",
+      }
+    }
+    return null
+  }, [selected])
+
+  function handleCopyCounter() {
+    if (!counterProposal) return
+    navigator.clipboard.writeText(counterProposal.proposedReplacement)
+    setCopiedCounter(true)
+    setTimeout(() => setCopiedCounter(false), 2000)
+  }
+
   if (!selected) return null
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_1fr]">
-      {/* List */}
+      {/* Clause List Column */}
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between px-1">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -106,7 +155,10 @@ export function ClauseExplorer({ customClauses }: ClauseExplorerProps) {
                 <button
                   key={clause.id}
                   type="button"
-                  onClick={() => setSelectedId(clause.id)}
+                  onClick={() => {
+                    setSelectedId(clause.id)
+                    setShowCounterProposal(false)
+                  }}
                   className={cn(
                     "flex items-center gap-3 rounded-xl border bg-card p-3 text-left transition-colors cursor-pointer",
                     active
@@ -134,7 +186,7 @@ export function ClauseExplorer({ customClauses }: ClauseExplorerProps) {
         </div>
       </div>
 
-      {/* Detail */}
+      {/* Selected Clause Detail Column */}
       <Card className="gap-5 p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-col gap-1">
@@ -143,23 +195,37 @@ export function ClauseExplorer({ customClauses }: ClauseExplorerProps) {
             </h3>
             <span className="text-sm text-muted-foreground">{selected.section}</span>
           </div>
-          <ReviewBadge level={selected.level} />
+          <div className="flex items-center gap-2">
+            <VoiceNarrator
+              textToRead={`${selected.title}. ${selected.explanation}. Why it matters: ${selected.whyItMatters}`}
+              label="Listen (Audio)"
+            />
+            <ReviewBadge level={selected.level} />
+          </div>
         </div>
 
+        {/* Original Contract Snippet */}
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/40 p-4">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Quote className="size-3.5" />
-            Original text
+          <div className="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Quote className="size-3.5" />
+              Original Contract Text
+            </span>
+            <span className="text-[10px] font-mono">Verbatim extract</span>
           </div>
           <p className="text-sm leading-relaxed text-foreground/80 font-serif italic">
             "{selected.originalText}"
           </p>
         </div>
 
+        {/* Plain Language Summary */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <FileText className="size-4 text-primary" />
-            In plain language
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <FileText className="size-4 text-primary" />
+              In plain language
+            </div>
+            <VoiceNarrator textToRead={selected.explanation} label="Narrate" />
           </div>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {selected.explanation}
@@ -183,12 +249,85 @@ export function ClauseExplorer({ customClauses }: ClauseExplorerProps) {
           </div>
         </div>
 
+        {/* AI Clause Redlining / Counter-Proposal Generator */}
+        {counterProposal && (
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Scale className="size-4 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Smart Counter-Proposal (AI Redline)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCounterProposal(!showCounterProposal)}
+                className="text-xs font-medium text-primary hover:underline cursor-pointer"
+              >
+                {showCounterProposal ? "Hide Redline" : "View Balanced Counter-Clause →"}
+              </button>
+            </div>
+
+            {showCounterProposal && (
+              <div className="space-y-3 pt-2 text-xs">
+                <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground">
+                      Proposed Replacement Wording:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyCounter}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:text-primary/80 cursor-pointer"
+                    >
+                      {copiedCounter ? (
+                        <>
+                          <Check className="size-3 text-emerald-500" />
+                          <span className="text-emerald-500">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="size-3" />
+                          <span>Copy Clause</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <p className="font-mono text-xs bg-muted/50 p-2.5 rounded border border-border leading-relaxed text-foreground">
+                    {counterProposal.proposedReplacement}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-card/70 border border-border p-2.5">
+                    <span className="font-semibold text-foreground block mb-0.5">
+                      Statutory Basis (Indian Law):
+                    </span>
+                    <p className="text-muted-foreground leading-relaxed text-[11px]">
+                      {counterProposal.statutoryBasis}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-card/70 border border-border p-2.5">
+                    <span className="font-semibold text-foreground block mb-0.5">
+                      Negotiation Rationale:
+                    </span>
+                    <p className="text-muted-foreground leading-relaxed text-[11px]">
+                      {counterProposal.negotiationRationale}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Questions to Clarify */}
         {selected.questions && selected.questions.length > 0 && (
           <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
             <div className="flex items-center gap-2">
               <HelpCircle className="size-4 text-chart-4" />
               <p className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                Questions to clarify
+                Questions to clarify with counterpart or counsel
               </p>
             </div>
             <ul className="flex flex-col gap-2">
